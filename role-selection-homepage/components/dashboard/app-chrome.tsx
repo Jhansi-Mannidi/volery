@@ -4,8 +4,11 @@ import React from "react"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 import { AppChromeContext } from "@/components/dashboard/app-chrome-context"
+import { MobileNavProvider } from "@/components/dashboard/mobile-nav-context"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { DashboardSidebar } from "@/components/dashboard/sidebar"
+import { MobileMenu } from "@/components/dashboard/mobile-menu"
+import { MobileBottomNav } from "@/components/dashboard/mobile-bottom-nav"
 
 const CHROMELESS_ROUTES = [
   "/login",
@@ -35,13 +38,19 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
 
   return (
     <AppChromeContext.Provider value={true}>
-      <div className="flex h-screen flex-col overflow-hidden bg-background">
-        <DashboardHeader persist title="" />
-        <div className="flex min-h-0 flex-1 overflow-hidden">
-          <DashboardSidebar persist />
-          <main className="volery-shell-main min-h-0 flex-1 overflow-auto">{children}</main>
+      <MobileNavProvider>
+        <div className="flex h-[100dvh] flex-col overflow-hidden bg-background">
+          <DashboardHeader persist title="" />
+          <div className="flex min-h-0 flex-1 overflow-hidden">
+            <DashboardSidebar persist />
+            <main className="volery-shell-main min-h-0 flex-1 overflow-auto overflow-x-hidden pb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+              {children}
+            </main>
+          </div>
+          <MobileMenu />
+          <MobileBottomNav />
         </div>
-      </div>
+      </MobileNavProvider>
     </AppChromeContext.Provider>
   )
 }

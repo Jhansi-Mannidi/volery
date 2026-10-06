@@ -101,7 +101,7 @@ export default function OrgProfilePage() {
             )}
           >
             <div className="relative shadow-none">
-              <div className="relative h-[200px] overflow-hidden shadow-none">
+              <div className="relative h-[140px] overflow-hidden shadow-none md:h-[200px]">
                 {hasOrgCover ? (
                   <button
                     type="button"
@@ -127,7 +127,7 @@ export default function OrgProfilePage() {
 
               <div className="absolute bottom-[-43px] left-5">
                 <div className="relative">
-                  <div className="relative h-[110px] w-[110px] overflow-hidden rounded-full border-4 border-background shadow-md">
+                  <div className="relative h-[84px] w-[84px] overflow-hidden rounded-full border-4 border-background shadow-md md:h-[110px] md:w-[110px]">
                     <Button
                       type="button"
                       variant="ghost"
@@ -215,7 +215,7 @@ export default function OrgProfilePage() {
 
           <div
             className={cn(
-              "sticky top-0 z-20 -mt-2.5 w-full shrink-0 overflow-hidden rounded-xl rounded-t-none border border-border/60 bg-background shadow-sm dark:bg-muted",
+              "sticky top-0 z-20 -mt-2.5 w-full shrink-0 overflow-x-auto overflow-y-hidden rounded-xl rounded-t-none border border-border/60 bg-background shadow-sm dark:bg-muted",
               PROFILE_CONTENT_MAX_WIDTH
             )}
           >

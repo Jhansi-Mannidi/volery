@@ -5,7 +5,7 @@ export const appsPageStyles = {
   appsMainHeading: "font-[550] text-[25px] text-foreground max-md:text-[22px]",
   searchAndHeadingContainerFlex:
     "flex justify-between max-md:flex-col max-md:justify-start max-md:gap-[30px]",
-  appResultsContainer: "flex flex-wrap w-full overflow-auto gap-[30px] p-5",
+  appResultsContainer: "flex flex-wrap w-full overflow-auto gap-[30px] p-5 max-md:justify-center max-md:gap-3 max-md:px-0 max-md:py-4",
   appCard:
     "h-[165px] w-[165px] bg-white dark:bg-card flex justify-center flex-col items-center text-foreground cursor-pointer font-medium rounded-[25px] transition-all border border-border max-md:h-[130px] max-md:w-[130px] hover:shadow-[0_18px_50px_-10px_rgba(51,119,255,0.34)] hover:scale-[1.05]",
   eachAppName:

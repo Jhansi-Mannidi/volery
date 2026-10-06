@@ -286,6 +286,33 @@ html.dark .volery-shell-main,
   height: 100% !important;
 }
 
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (max-width: 767px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .volery-shell-main {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .volery-shell-main table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .volery-shell-main [data-slot='dialog-content'] {
+    width: calc(100% - 1.5rem);
+    max-width: calc(100% - 1.5rem);
+  }
+}
+
 /* ===== Global Scrollbar Styles ===== */
 
 /* Light Theme Scrollbar */

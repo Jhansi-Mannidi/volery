@@ -11,77 +11,18 @@ import {
   getRoleModules,
   type AppMenu,
   type AppModule,
-  type AppSubMenu,
 } from "@/TenantsComponents/Volery/appModules"
 import { useAppChrome } from "@/components/dashboard/app-chrome-context"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
-
-const exactMatchPaths = [
-  "/startups",
-  "/investors",
-  "/settings",
-  "/ai-insights",
-  "/documents",
-  "/founder/profile",
-  "/portfolio",
-  "/syndicate",
-  "/community",
-  "/deals",
-  "/analyst/ai-insights",
-  "/analyst/companies",
-  "/analyst/reports",
-]
-
-function pathOnly(href: string) {
-  return href.split("?")[0]
-}
-
-function isPathActive(pathname: string, href: string, exact = false) {
-  const clean = pathOnly(href)
-  if (clean === "/") return pathname === "/"
-  if (exact || exactMatchPaths.includes(clean)) return pathname === clean
-  return pathname === clean || pathname.startsWith(clean + "/")
-}
-
-function hrefsForMenu(menu: AppMenu) {
-  return [menu.href, ...(menu.subMenus?.map((sub) => sub.href) ?? [])]
-}
-
-function moduleMatchScore(module: AppModule, pathname: string) {
-  let best = 0
-  for (const menu of module.menus) {
-    for (const href of hrefsForMenu(menu)) {
-      const clean = pathOnly(href)
-      if (clean === "/") {
-        if (pathname === "/") best = Math.max(best, 1)
-        continue
-      }
-      if (pathname === clean || pathname.startsWith(clean + "/")) {
-        best = Math.max(best, clean.length)
-      }
-    }
-  }
-  return best
-}
-
-function findModuleForPath(modules: AppModule[], pathname: string) {
-  let best: AppModule | null = null
-  let bestScore = 0
-  for (const module of modules) {
-    const score = moduleMatchScore(module, pathname)
-    if (score > bestScore) {
-      best = module
-      bestScore = score
-    }
-  }
-  return best
-}
-
-function firstHref(module: AppModule) {
-  const menu = module.menus[0]
-  return menu?.subMenus?.[0]?.href || menu?.href || "/"
-}
+import {
+  exactMatchPaths,
+  expandedMenusForPath,
+  findModuleForPath,
+  firstHref,
+  isPathActive,
+  pathOnly,
+} from "@/components/dashboard/nav-utils"
 
 type SidebarProps = {
   role?: UserRole
@@ -120,14 +61,7 @@ export function DashboardSidebar({ role, userRole, persist }: SidebarProps = {})
   }, [pathname, modules])
 
   useEffect(() => {
-    const menusToOpen: string[] = []
-    for (const module of modules) {
-      for (const menu of module.menus) {
-        if (menu.subMenus?.some((sub) => isPathActive(pathname, sub.href))) {
-          menusToOpen.push(menu.id)
-        }
-      }
-    }
+    const menusToOpen = expandedMenusForPath(modules, pathname)
     if (menusToOpen.length) {
       setExpandedMenus((prev) => [...new Set([...prev, ...menusToOpen])])
     }

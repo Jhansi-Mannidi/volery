@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   description: 'Syndication management platform for deal flow, startup tracking, and investor relationships',
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: 'cover' as const,
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{

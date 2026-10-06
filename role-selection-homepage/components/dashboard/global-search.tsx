@@ -345,7 +345,7 @@ export function GlobalSearch({ open, onOpenChange, searchPlaceholder }: GlobalSe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] p-0 gap-0 overflow-hidden">
+      <DialogContent className="w-[calc(100%-1.5rem)] max-w-[calc(100%-1.5rem)] gap-0 overflow-hidden p-0 sm:max-w-[600px]">
         <DialogHeader className="sr-only">
           <DialogTitle>Search</DialogTitle>
         </DialogHeader>
