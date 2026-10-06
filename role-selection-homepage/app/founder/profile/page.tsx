@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { DashboardSidebar } from "@/components/dashboard/sidebar"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { ProtectedRoute } from "@/components/auth/protected-route"
@@ -20,7 +21,7 @@ import { FundingTab } from "@/components/founder-profile/funding-tab"
 import { DocumentsTab } from "@/components/founder-profile/documents-tab"
 import { SettingsTab } from "@/components/founder-profile/settings-tab"
 
-export default function FounderProfilePage() {
+function FounderProfilePage() {
   const searchParams = useSearchParams()
   const defaultTab = searchParams.get("tab") || "overview"
   return (
@@ -90,5 +91,13 @@ export default function FounderProfilePage() {
         </div>
       </div>
     </ProtectedRoute>
+  )
+}
+
+export default function FounderProfilePageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <FounderProfilePage />
+    </Suspense>
   )
 }

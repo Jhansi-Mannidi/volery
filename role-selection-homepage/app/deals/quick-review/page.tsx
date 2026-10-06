@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { DashboardSidebar } from "@/components/dashboard/sidebar"
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { ProtectedRoute } from "@/components/auth/protected-route"
 
-export default function QuickReviewPage() {
+function QuickReviewPage() {
   const searchParams = useSearchParams()
   const dealId = searchParams.get("id")
 
@@ -54,5 +55,13 @@ export default function QuickReviewPage() {
         </div>
       </div>
     </ProtectedRoute>
+  )
+}
+
+export default function QuickReviewPageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <QuickReviewPage />
+    </Suspense>
   )
 }

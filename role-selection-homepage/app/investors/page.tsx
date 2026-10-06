@@ -263,7 +263,7 @@ function formatCheckSize(amount: number): string {
 
 const Loading = () => null
 
-export default function InvestorsPage() {
+function InvestorsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { toast } = useToast()
@@ -900,6 +900,14 @@ export default function InvestorsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </Suspense>
+  )
+}
+
+export default function InvestorsPageWrapper() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <InvestorsPage />
     </Suspense>
   )
 }

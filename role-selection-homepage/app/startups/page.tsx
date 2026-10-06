@@ -167,7 +167,15 @@ type ViewMode = "grid" | "list" | "table"
 
 const stageToSlug = (stage: string) => stage.toLowerCase().replace(/\s+/g, "-")
 
-export default function StartupsPage() {
+export default function StartupsPageWrapper() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <StartupsPage />
+    </Suspense>
+  )
+}
+
+function StartupsPage() {
   const router = useRouter()
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
   const [searchQuery, setSearchQuery] = useState("")
