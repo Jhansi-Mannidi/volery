@@ -671,7 +671,7 @@ export function NotificationCenter() {
     <>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon" className="relative h-8 w-8">
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-destructive text-[10px] font-medium text-destructive-foreground rounded-full flex items-center justify-center">
@@ -682,7 +682,7 @@ export function NotificationCenter() {
         </PopoverTrigger>
         <PopoverContent
           align="end"
-          className="w-[380px] p-0"
+          className="w-[min(380px,calc(100vw-1rem))] p-0"
           sideOffset={8}
         >
           {/* Header */}

@@ -66,10 +66,6 @@ export function firstHref(module: AppModule) {
   return menu?.subMenus?.[0]?.href || menu?.href || "/"
 }
 
-export function getBottomNavModules(modules: AppModule[]) {
-  return modules.filter((module) => module.id !== "settings").slice(0, 4)
-}
-
 export function expandedMenusForPath(modules: AppModule[], pathname: string) {
   const menusToOpen: string[] = []
   for (const module of modules) {

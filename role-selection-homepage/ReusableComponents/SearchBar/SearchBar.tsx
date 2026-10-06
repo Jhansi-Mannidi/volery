@@ -18,12 +18,13 @@ const Search: React.FC<SearchProps> = ({
 }) => {
   return (
     <div
-      className="flex h-6 w-[238px] items-center gap-[5px] rounded-[5px] border border-border bg-transparent px-1"
+      className="flex h-6 w-[238px] max-md:w-full max-md:max-w-full items-center gap-[5px] rounded-[5px] border border-border bg-transparent px-1"
       style={stylesInline}
     >
-      <SearchIcon className="h-3.5 w-3.5 text-muted-foreground" />
+      <SearchIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <input
-        className="h-[22px] w-[250px] border-none bg-transparent text-xs text-foreground focus:border-none focus:outline-none"
+        className="h-[22px] min-w-0 w-full border-none bg-transparent text-xs text-foreground focus:border-none focus:outline-none"
+
         placeholder={placeholder}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}

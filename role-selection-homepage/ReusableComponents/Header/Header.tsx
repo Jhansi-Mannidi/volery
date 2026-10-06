@@ -35,10 +35,10 @@ const Header: React.FC = () => {
 
   return (
     <TooltipProvider>
-      <header className="fixed top-0 left-0 right-0 z-50 flex h-[43px] items-center justify-between border-b bg-background px-3 py-2">
+      <header className="fixed top-0 left-0 right-0 z-50 flex h-[43px] items-center justify-between border-b bg-background px-1 py-2 min-[756px]:px-3">
         <div className="flex items-center space-x-2">
           <Link href="/role-selection" className="flex items-center">
-            <CompanyLogo className="h-[25px] gap-1.5 [&_span:first-child]:h-6 [&_span:first-child]:w-6 [&_span:first-child]:text-xs [&_span:last-child]:text-sm" />
+            <CompanyLogo className="h-[25px] gap-1.5 [&_span:first-child]:h-6 [&_span:first-child]:w-6 [&_span:first-child]:text-xs [&_span:last-child]:text-sm max-[399px]:[&_span:last-child]:hidden" />
           </Link>
           <div className="mx-2 ml-6 hidden h-6 w-[2px] bg-border md:block" />
           <Tooltip>
@@ -50,7 +50,7 @@ const Header: React.FC = () => {
               >
                 <Link href="/role-selection">
                   <Home className="h-4 w-4" />
-                  <span className="hidden text-sm font-medium md:inline">Home</span>
+                  <span className="hidden text-sm font-medium min-[756px]:inline">Home</span>
                 </Link>
               </Button>
             </TooltipTrigger>
@@ -58,7 +58,7 @@ const Header: React.FC = () => {
           </Tooltip>
         </div>
 
-        <div className="ml-auto flex items-center space-x-2">
+        <div className="ml-auto flex items-center space-x-0.5 min-[756px]:space-x-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" asChild className="h-8 w-8">

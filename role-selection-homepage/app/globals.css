@@ -290,7 +290,7 @@ html.dark .volery-shell-main,
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 755px) {
   html,
   body {
     overflow-x: hidden;

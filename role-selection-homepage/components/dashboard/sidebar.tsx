@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { ChevronDown, ChevronRight, Circle, Menu, Search } from "lucide-react"
+import { ChevronDown, ChevronRight, Circle, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth, type UserRole } from "@/lib/auth-context"
 import {
@@ -11,8 +11,10 @@ import {
   getRoleModules,
   type AppMenu,
   type AppModule,
+  type AppSubMenu,
 } from "@/TenantsComponents/Volery/appModules"
 import { useAppChrome } from "@/components/dashboard/app-chrome-context"
+import { useSidebarNav } from "@/components/dashboard/mobile-nav-context"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
 import {
@@ -35,13 +37,13 @@ export function DashboardSidebar({ role, userRole, persist }: SidebarProps = {})
   const pathname = usePathname()
   const router = useRouter()
   const { user } = useAuth()
+  const { isSidebarOpen, setIsSidebarOpen, isMobile } = useSidebarNav()
   const currentRole = role || userRole || user?.activeRole || "investment-banker"
   const modules = useMemo(() => getRoleModules(currentRole), [currentRole])
 
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null)
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [panelOpen, setPanelOpen] = useState(true)
   const [sidebarWidth, setSidebarWidth] = useState(225)
   const dragStartX = useRef(0)
   const dragStartWidth = useRef(225)
@@ -67,7 +69,17 @@ export function DashboardSidebar({ role, userRole, persist }: SidebarProps = {})
     }
   }, [pathname, modules])
 
+  useEffect(() => {
+    if (!isMobile || !isSidebarOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [isMobile, isSidebarOpen])
+
   const activeModule = modules.find((module) => module.id === activeModuleId) || modules[0]
+  const showMenuPanel = Boolean(activeModule) && (isMobile || isSidebarOpen)
 
   const filteredMenus = useMemo(() => {
     const q = searchTerm.trim().toLowerCase()
@@ -79,10 +91,14 @@ export function DashboardSidebar({ role, userRole, persist }: SidebarProps = {})
     })
   }, [activeModule, searchTerm])
 
+  const closeMobileDrawer = () => {
+    if (isMobile) setIsSidebarOpen(false)
+  }
+
   const selectModule = (module: AppModule) => {
     pendingModuleId.current = module.id
     setActiveModuleId(module.id)
-    setPanelOpen(true)
+    if (!isMobile) setIsSidebarOpen(true)
     setSearchTerm("")
     const href = firstHref(module)
     if (pathOnly(href) !== pathname) {
@@ -97,6 +113,7 @@ export function DashboardSidebar({ role, userRole, persist }: SidebarProps = {})
   }
 
   const onResizeStart = (e: React.MouseEvent) => {
+    if (isMobile) return
     e.preventDefault()
     resizing.current = true
     dragStartX.current = e.clientX
@@ -122,6 +139,7 @@ export function DashboardSidebar({ role, userRole, persist }: SidebarProps = {})
       <Link
         key={sub.id}
         href={sub.href}
+        onClick={closeMobileDrawer}
         data-active={active ? "true" : "false"}
         className={cn(
           "flex items-center px-3 rounded-md h-[34px] text-[12.5px] transition-colors",
@@ -183,7 +201,7 @@ export function DashboardSidebar({ role, userRole, persist }: SidebarProps = {})
             {rowInner}
           </button>
         ) : (
-          <Link href={menu.href} data-active={leafActive ? "true" : "false"} className={rowClass}>
+          <Link href={menu.href} onClick={closeMobileDrawer} data-active={leafActive ? "true" : "false"} className={rowClass}>
             {rowInner}
           </Link>
         )}
@@ -202,87 +220,99 @@ export function DashboardSidebar({ role, userRole, persist }: SidebarProps = {})
     )
   }
 
-  return (
-    <TooltipProvider>
-      <div className="hidden md:flex h-full bg-background">
-        <div className="flex flex-col items-center bg-background border-r px-2 py-2 w-[80px] gap-1 overflow-y-auto overflow-x-hidden shrink-0">
-          <button
-            type="button"
-            onClick={() => setPanelOpen((open) => !open)}
-            className="flex items-center justify-center w-[64px] h-8 rounded-[6px] text-muted-foreground hover:bg-primary/10 mb-1"
-            title={panelOpen ? "Hide menus" : "Show menus"}
-          >
-            <Menu className="h-4 w-4" />
-          </button>
-          {modules.map((module) => {
-            const meta = getModuleRailMeta(module)
-            const Icon = meta.icon
-            const isActive = activeModule?.id === module.id
-            return (
-              <Tooltip key={module.id}>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={() => selectModule(module)}
-                    title={meta.label}
+  const renderCascadingNav = () => (
+    <>
+      <div className="flex flex-col items-center bg-background border-r px-2 py-2 w-[80px] gap-1 overflow-y-auto overflow-x-hidden shrink-0">
+        {modules.map((module) => {
+          const meta = getModuleRailMeta(module)
+          const Icon = meta.icon
+          const isActive = activeModule?.id === module.id
+          return (
+            <Tooltip key={module.id}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => selectModule(module)}
+                  title={meta.label}
+                  className={cn(
+                    "flex flex-col items-center justify-center w-[64px] h-[62px] rounded-[6px] transition-colors gap-1 px-1 shrink-0",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-primary/10 bg-primary/5 text-foreground"
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span
                     className={cn(
-                      "flex flex-col items-center justify-center w-[64px] h-[62px] rounded-[6px] transition-colors gap-1 px-1 shrink-0",
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-primary/10 bg-primary/5 text-foreground"
+                      "text-[9.5px] font-normal leading-[1.15] text-center break-words max-w-full line-clamp-2",
+                      isActive ? "text-primary-foreground" : "text-foreground"
                     )}
                   >
-                    <Icon className="h-4 w-4" />
-                    <span
-                      className={cn(
-                        "text-[9.5px] font-normal leading-[1.15] text-center break-words max-w-full line-clamp-2",
-                        isActive ? "text-primary-foreground" : "text-foreground"
-                      )}
-                    >
-                      {meta.label}
-                    </span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right">{meta.label}</TooltipContent>
-              </Tooltip>
-            )
-          })}
-        </div>
+                    {meta.label}
+                  </span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">{meta.label}</TooltipContent>
+            </Tooltip>
+          )
+        })}
+      </div>
 
-        {panelOpen && activeModule && (
-          <div
-            className="flex flex-col h-full bg-background border-r relative"
-            style={{ width: `${sidebarWidth}px` }}
-          >
-            <div className="p-2 border-b bg-background">
-              <div className="relative flex items-center">
-                <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search..."
-                  className="pl-8 h-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+      {showMenuPanel && activeModule && (
+        <div
+          className="flex flex-col h-full bg-background border-r relative"
+          style={{ width: isMobile ? 225 : sidebarWidth }}
+        >
+          <div className="p-2 border-b bg-background">
+            <div className="relative flex items-center">
+              <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search..."
+                className="pl-8 h-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-2 bg-background min-h-0">
+            {filteredMenus.length === 0 ? (
+              <div className="flex justify-center text-muted-foreground text-sm p-8">
+                No Menu Screens Found
               </div>
-            </div>
+            ) : (
+              filteredMenus.map(renderMenu)
+            )}
+          </div>
 
-            <div className="flex-1 overflow-y-auto p-2 bg-background min-h-0">
-              {filteredMenus.length === 0 ? (
-                <div className="flex justify-center text-muted-foreground text-sm p-8">
-                  No Menu Screens Found
-                </div>
-              ) : (
-                filteredMenus.map(renderMenu)
-              )}
-            </div>
-
+          {!isMobile && (
             <div
               className="absolute top-0 right-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-border"
               onMouseDown={onResizeStart}
             />
+          )}
+        </div>
+      )}
+    </>
+  )
+
+  return (
+    <TooltipProvider>
+      <div className="hidden h-full bg-background min-[756px]:flex">{renderCascadingNav()}</div>
+
+      {isMobile && isSidebarOpen && (
+        <>
+          <button
+            type="button"
+            className="fixed inset-x-0 bottom-0 top-[43px] z-40 bg-black/40"
+            aria-label="Close navigation"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <div className="fixed top-[43px] bottom-0 left-0 z-50 flex bg-background shadow-xl">
+            {renderCascadingNav()}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </TooltipProvider>
   )
 }

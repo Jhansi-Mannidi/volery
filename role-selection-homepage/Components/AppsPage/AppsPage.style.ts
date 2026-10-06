@@ -10,7 +10,7 @@ export const appsPageStyles = {
     "h-[165px] w-[165px] bg-white dark:bg-card flex justify-center flex-col items-center text-foreground cursor-pointer font-medium rounded-[25px] transition-all border border-border max-md:h-[130px] max-md:w-[130px] hover:shadow-[0_18px_50px_-10px_rgba(51,119,255,0.34)] hover:scale-[1.05]",
   eachAppName:
     "text-sm text-center w-[140px] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden text-ellipsis break-words px-[5px] py-2.5 text-foreground max-md:w-[130px]",
-  headingDescription: "text-[15px] text-muted-foreground font-normal pr-5",
+  headingDescription: "text-[15px] text-muted-foreground font-normal pr-5 max-md:pr-0 max-md:text-[13px]",
   logoOrIconStyles:
     "h-[50px] w-[60px] p-[5px] border border-[#4A8EDF] rounded-lg flex flex-col justify-center items-center text-[#4A8EDF]",
 }

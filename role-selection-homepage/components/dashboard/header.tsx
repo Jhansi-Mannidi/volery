@@ -3,7 +3,7 @@
 import React from "react"
 import { useState } from "react"
 import Link from "next/link"
-import { Plus, Search, Building2, Users, CheckSquare, Menu, Home, Sparkles, FileText, LogOut, Rocket, LayoutGrid } from "lucide-react"
+import { Plus, Search, Building2, Users, CheckSquare, Home, Sparkles, FileText, LogOut, Rocket, LayoutGrid, PanelRight } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
 import { NotificationCenter } from "@/components/dashboard/notification-center"
 import { ThemeSettingsDropdown } from "@/components/theme-settings-dropdown"
@@ -22,7 +22,13 @@ import { QuickAddModal } from "@/components/startup/quick-add-modal"
 import { AddEditInvestorModal } from "@/components/investor/add-edit-investor-modal"
 import { AIAssistant } from "@/components/dashboard/ai-assistant"
 import { useAppChrome } from "@/components/dashboard/app-chrome-context"
-import { useMobileNav } from "@/components/dashboard/mobile-nav-context"
+import { useSidebarNav } from "@/components/dashboard/mobile-nav-context"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface HeaderProps {
   title?: string
@@ -123,15 +129,14 @@ const roleConfig: Record<string, {
 
 export function DashboardHeader({ persist }: HeaderProps) {
   const inAppChrome = useAppChrome()
-  const { setOpen: setMobileMenuOpen } = useMobileNav()
+  const { toggleSidebar, isSidebarOpen } = useSidebarNav()
   const [searchOpen, setSearchOpen] = useState(false)
   const [quickAddOpen, setQuickAddOpen] = useState(false)
   const [addInvestorOpen, setAddInvestorOpen] = useState(false)
   const [createTaskOpen, setCreateTaskOpen] = useState(false)
   const [aiMode, setAiMode] = useState(false)
-  const { user, logout, setActiveRole } = useAuth()
+  const { user, logout } = useAuth()
   
-  // Get user initials for avatar
   const getUserInitials = () => {
     if (!user?.name) return "U"
     const names = user.name.split(" ")
@@ -149,45 +154,67 @@ export function DashboardHeader({ persist }: HeaderProps) {
 
   return (
     <>
-      {/* Desktop Header — platform chrome (43px) */}
-      <header className="hidden md:flex items-center justify-between h-[43px] px-3 py-2 border-b border-border bg-background">
-        <div className="flex items-center space-x-2 min-w-0">
-          <Link
-            href="/role-selection"
-            className="flex items-center gap-2"
-            aria-label="Go to apps"
+      <TooltipProvider>
+        <header className="flex items-center justify-between h-[43px] px-1 min-[756px]:px-3 py-2 border-b border-border bg-background shrink-0">
+          <div className="flex items-center space-x-0.5 min-[756px]:space-x-2 min-w-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={toggleSidebar}
+                  aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+                  aria-expanded={isSidebarOpen}
+                >
+                  <PanelRight className="h-5 w-5 text-foreground" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Expand And Collapsible SideBar</TooltipContent>
+            </Tooltip>
+
+            <Link
+              href="/role-selection"
+              className="flex items-center gap-2 min-w-0"
+              aria-label="Go to apps"
+            >
+              <div className="flex items-center justify-center w-6 h-6 bg-primary rounded-md shrink-0">
+                <span className="text-primary-foreground font-semibold text-[11px]">V</span>
+              </div>
+              <span className="hidden min-[400px]:inline text-sm font-semibold text-foreground truncate">Volery</span>
+            </Link>
+
+            <div className="h-6 w-[2px] bg-border mx-2 hidden min-[756px]:block ml-6" />
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/role-selection"
+                  className="flex items-center gap-1.5 px-2.5 h-8 rounded-md text-foreground hover:bg-primary hover:text-primary-foreground"
+                >
+                  <Home className="h-4 w-4" />
+                  <span className="text-sm font-medium hidden min-[756px]:inline">Home</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>Go to Home</TooltipContent>
+            </Tooltip>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="hidden min-[1024px]:flex items-center gap-2 h-7 max-w-xs flex-1 mx-4 px-2 rounded-[5px] border border-border bg-transparent text-muted-foreground hover:text-foreground text-left text-xs"
           >
-            <div className="flex items-center justify-center w-6 h-6 bg-primary rounded-md shrink-0">
-              <span className="text-primary-foreground font-semibold text-[11px]">V</span>
-            </div>
-            <span className="text-sm font-semibold text-foreground">Volery</span>
-          </Link>
-          <div className="h-6 w-[2px] bg-border mx-2 hidden md:block ml-6" />
-          <Link
-            href="/role-selection"
-            className="flex items-center gap-1.5 px-2.5 h-8 rounded-md text-foreground hover:bg-primary hover:text-primary-foreground"
-          >
-            <Home className="h-4 w-4" />
-            <span className="text-sm font-medium hidden lg:inline">Home</span>
-          </Link>
-        </div>
+            <Search className="w-3.5 h-3.5 shrink-0" />
+            <span className="flex-1 truncate">{currentRoleConfig.searchPlaceholder}</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setSearchOpen(true)}
-          className="hidden lg:flex items-center gap-2 h-7 max-w-xs flex-1 mx-4 px-2 rounded-[5px] border border-border bg-transparent text-muted-foreground hover:text-foreground text-left text-xs"
-        >
-          <Search className="w-3.5 h-3.5 shrink-0" />
-          <span className="flex-1 truncate">{currentRoleConfig.searchPlaceholder}</span>
-        </button>
-
-        <div className="flex items-center space-x-2 ml-auto">
-
+          <div className="flex items-center space-x-0.5 min-[756px]:space-x-2 ml-auto min-w-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="sm" variant="ghost" className="h-8 gap-1.5 px-2">
                   <Plus className="w-4 h-4" />
-                  <span className="hidden lg:inline text-xs">Add</span>
+                  <span className="hidden min-[1024px]:inline text-xs">Add</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -217,6 +244,16 @@ export function DashboardHeader({ persist }: HeaderProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 min-[1024px]:hidden"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+            >
+              <Search className="h-4 w-4 text-foreground" />
+            </Button>
+
             <Button variant="ghost" size="icon" asChild className="h-8 w-8">
               <Link href="/role-selection" aria-label="Apps">
                 <LayoutGrid className="h-4 w-4 text-foreground" />
@@ -233,13 +270,12 @@ export function DashboardHeader({ persist }: HeaderProps) {
               <Sparkles className="h-4 w-4 text-foreground" />
             </Button>
 
-            {/* Notifications */}
             <NotificationCenter />
 
-            <ThemeToggleSimple />
-
-            {/* Theme Settings (NEW) */}
-            <ThemeSettingsDropdown />
+            <div className="hidden min-[480px]:contents">
+              <ThemeToggleSimple />
+              <ThemeSettingsDropdown />
+            </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -275,108 +311,21 @@ export function DashboardHeader({ persist }: HeaderProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-      </header>
+        </header>
+      </TooltipProvider>
 
-      {/* Mobile Header */}
-      <header className="flex h-[43px] items-center justify-between border-b border-border bg-background px-2 md:hidden">
-        <div className="flex min-w-0 items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setMobileMenuOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Link href="/role-selection" className="flex items-center gap-2" aria-label="Go to apps">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary">
-              <span className="text-[11px] font-semibold text-primary-foreground">V</span>
-            </div>
-            <span className="truncate text-sm font-semibold text-foreground">Volery</span>
-          </Link>
-        </div>
-        <div className="flex items-center gap-0.5">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Add">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {currentRoleConfig.addMenuItems.map((item) => {
-                const IconComponent = item.icon
-                return (
-                  <DropdownMenuItem
-                    key={item.action}
-                    onClick={() => {
-                      if (item.action === "quick-add") setQuickAddOpen(true)
-                      else if (item.action === "add-investor") setAddInvestorOpen(true)
-                      else if (item.action === "create-task") setCreateTaskOpen(true)
-                    }}
-                  >
-                    <IconComponent className="mr-2 h-4 w-4" />
-                    {item.label}
-                  </DropdownMenuItem>
-                )
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSearchOpen(true)} aria-label="Search">
-            <Search className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setAiMode(true)} aria-label="AI assistant">
-            <Sparkles className="h-4 w-4" />
-          </Button>
-          <NotificationCenter />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex h-7 w-7 items-center justify-center rounded-full bg-primary">
-                <span className="text-[11px] font-medium text-primary-foreground">{getUserInitials()}</span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="px-2 py-1.5">
-                <p className="text-sm font-medium">{user?.name || "User"}</p>
-                <p className="text-xs text-muted-foreground">{user?.email || ""}</p>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/profile">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings">Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/role-selection">Apps</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive">
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
-
-      {/* Global Search Modal */}
       <GlobalSearch 
         open={searchOpen} 
         onOpenChange={setSearchOpen} 
         searchPlaceholder={currentRoleConfig.searchPlaceholder}
       />
 
-      {/* Quick Add Startup Modal */}
       <QuickAddModal open={quickAddOpen} onOpenChange={setQuickAddOpen} />
 
-      {/* Add Investor Modal */}
       <AddEditInvestorModal open={addInvestorOpen} onOpenChange={setAddInvestorOpen} mode="add" />
 
-      {/* Create Task Modal */}
       <CreateTaskModal open={createTaskOpen} onOpenChange={setCreateTaskOpen} />
 
-      {/* AI Assistant */}
       <AIAssistant isOpen={aiMode} onClose={() => setAiMode(false)} />
     </>
   )
